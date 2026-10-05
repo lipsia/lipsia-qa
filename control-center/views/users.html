@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Users · QA Control Center</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Users</h1>
+        <p>Accounts that can sign in to the Control Center.</p>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn btn-primary" id="add-user-btn" type="button">Add user</button>
+      </div>
+    </div>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>All users <span class="badge" id="user-count">0</span></h2>
+        <span class="hint">Admins can start runs for everyone, see the dashboard and manage users.</span>
+      </div>
+      <div class="card-body flush table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>User</th><th>Role</th><th>Tag</th><th>Created</th><th class="num">Actions</th></tr>
+          </thead>
+          <tbody id="user-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/users.js"></script>
+</body>
+</html>
