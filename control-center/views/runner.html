@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Runner · QA Control Center</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Rubik:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/runner.css">
+</head>
+<body>
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Test Runner</h1>
+        <p>Pick a spec and an environment, then start the run.</p>
+      </div>
+    </div>
+
+    <div class="runner-grid">
+      <section class="card">
+        <div class="card-head"><h2>New run</h2></div>
+        <div class="card-body stack">
+          <div class="field">
+            <label for="spec-input">Test</label>
+            <div class="combobox" id="spec-combobox">
+              <input class="input" id="spec-input" placeholder="Search specs…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="spec-list">
+              <ul class="combobox-list" id="spec-list" role="listbox" hidden></ul>
+            </div>
+            <span class="field-hint" id="spec-hint"></span>
+          </div>
+
+          <div class="field">
+            <label>Environment</label>
+            <div class="stage-picker" id="stage-picker" role="radiogroup"></div>
+          </div>
+
+          <div class="field" id="steps-field" hidden>
+            <label>Test steps</label>
+            <div id="step-suites" class="stack" style="gap:14px"></div>
+          </div>
+
+          <div class="option-grid">
+            <div class="field">
+              <label for="browser">Browser</label>
+              <select class="input" id="browser"></select>
+            </div>
+            <div class="field">
+              <label for="parallel">Parallel runs</label>
+              <input class="input" id="parallel" type="number" min="1" value="1">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Speed</label>
+            <div class="segmented" id="speed">
+              <button type="button" data-delay="0">Instant</button>
+              <button type="button" data-delay="500">Fast</button>
+              <button type="button" data-delay="1500">Normal</button>
+              <button type="button" data-delay="3000">Slow</button>
+            </div>
+          </div>
+
+          <div class="stack" style="gap:14px">
+            <label class="switch">
+              <input type="checkbox" id="headed">
+              <span class="switch-track"></span>
+              <span class="switch-text"><strong>Live view</strong><span id="headed-hint">Watch the browser while the test runs (read-only).</span></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="record-video">
+              <span class="switch-track"></span>
+              <span class="switch-text"><strong>Record video</strong><span>Download the recording when the run is finished.</span></span>
+            </label>
+          </div>
+
+          <details class="command-preview">
+            <summary>Command preview</summary>
+            <pre id="command-preview" class="mono">Select a test to see the command.</pre>
+          </details>
+
+          <button class="btn btn-primary btn-lg btn-block" id="run-btn" type="button" disabled>
+            <span id="run-btn-label">Start run</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="stack">
+        <section class="card">
+          <div class="card-head">
+            <h2>Active runs</h2>
+            <span class="badge" id="quota" title="Your concurrent sessions"></span>
+          </div>
+          <div class="card-body flush" id="process-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div class="output-title">
+              <h2>Output</h2>
+              <span id="output-status"></span>
+            </div>
+            <button class="btn btn-sm btn-ghost" id="clear-output" type="button">Clear</button>
+          </div>
+          <div class="terminal" id="terminal"><span class="placeholder">The output of your run appears here.</span></div>
+        </section>
+
+        <section class="card" id="video-card" hidden>
+          <div class="card-head">
+            <h2>Recording</h2>
+            <div class="page-head-actions">
+              <button class="btn btn-sm btn-danger" id="delete-video" type="button">Delete recording</button>
+              <button class="btn btn-sm btn-ghost" id="hide-video" type="button">Hide</button>
+            </div>
+          </div>
+          <div class="card-body" id="video-list"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/runner.js"></script>
+</body>
+</html>
