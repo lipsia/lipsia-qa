@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coverage · QA Control Center</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/coverage.css">
+</head>
+<body>
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Test coverage</h1>
+        <p>Which systems and features are covered by automated tests. Changes are saved automatically.</p>
+      </div>
+      <div class="page-head-actions">
+        <button class="btn" id="history-btn" type="button" hidden>Change history</button>
+        <button class="btn btn-primary" id="add-item-btn" type="button">Add item</button>
+      </div>
+    </div>
+
+    <section class="card summary-card">
+      <div class="card-body">
+        <div class="summary-head">
+          <div><span class="summary-value" id="summary-percent">0%</span><span class="muted"> covered</span></div>
+          <div class="summary-legend" id="summary-legend"></div>
+        </div>
+        <div class="progress summary-bar" id="summary-bar"></div>
+      </div>
+    </section>
+
+    <div id="groups" class="stack"></div>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/coverage.js"></script>
+</body>
+</html>

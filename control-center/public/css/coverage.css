@@ -1,0 +1,50 @@
+:root {
+  --status-done: var(--success);
+  --status-progress: var(--brand);
+  --status-partial: #ff7133;
+  --status-missing: var(--danger);
+  --status-onhold: var(--warning);
+  --status-outofscope: var(--text-faint);
+}
+
+.summary-card { margin-bottom: 20px; }
+.summary-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.summary-value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+.summary-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--text-muted); }
+.summary-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.summary-bar { height: 12px; }
+
+.group-head { display: flex; align-items: center; gap: 12px; }
+.group-head .progress { width: 120px; }
+
+.coverage-table td { padding: 8px 12px; }
+.coverage-table td:first-child { padding-left: 20px; }
+.coverage-table .input-inline { height: 34px; }
+.coverage-table .col-name { min-width: 200px; }
+.coverage-table .col-type { width: 170px; }
+.coverage-table .col-status { width: 170px; }
+.coverage-table .col-tool { width: 160px; }
+.coverage-table .col-note { min-width: 220px; }
+.coverage-table .col-actions { width: 56px; text-align: right; padding-right: 16px; }
+
+.status-select {
+  height: 32px;
+  padding: 0 28px 0 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--status-color);
+  background-color: color-mix(in srgb, var(--status-color) 14%, transparent);
+}
+.status-select:focus { outline: 2px solid color-mix(in srgb, var(--status-color) 40%, transparent); }
+.status-select option { color: var(--text); background: var(--surface); }
+
+.delete-btn { color: var(--text-faint); }
+.delete-btn:hover { color: var(--danger); background: var(--danger-soft); }
+
+.history-table td { font-size: 13px; vertical-align: top; }
+.history-change { display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
+.history-change del { color: var(--text-faint); }
