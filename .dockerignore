@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+.env
+node_modules
+data
+test-reports
+cypress.env.json
+cypress/screenshots
+cypress/videos
+cypress/downloads
+*.log

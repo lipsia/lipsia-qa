@@ -1,0 +1,33 @@
+{
+  "name": "lipsia-qa",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Cypress end-to-end test framework with a web-based Control Center",
+  "author": "Lipsia Digital GmbH",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "cy:open": "cypress open --e2e",
+    "cy:run": "cypress run",
+    "control-center": "node control-center/server.js",
+    "user": "node scripts/manage-user.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "cypress": "^16.1.1",
+    "cypress-multi-reporters": "^2.0.5",
+    "mocha-junit-reporter": "^2.2.1",
+    "mochawesome": "^8.1.1"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true,
+    "cypress@16.1.1": true
+  }
+}
