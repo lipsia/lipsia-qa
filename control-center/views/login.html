@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · QA Control Center</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+  <main class="login">
+    <section class="login-brand">
+      <img src="/assets/logo-white.svg" alt="Lipsia Digital" class="login-logo">
+      <div class="login-claim">
+        <h1>QA Control Center</h1>
+        <p>Run, watch and track end-to-end tests across your environments.</p>
+      </div>
+      <ul class="login-points">
+        <li>Run Cypress specs against dev, staging or production</li>
+        <li>Follow headed runs live in the browser</li>
+        <li>Keep an eye on results and test coverage</li>
+      </ul>
+    </section>
+
+    <section class="login-panel">
+      <form id="login-form" class="login-form" novalidate>
+        <h2 id="form-title">Sign in</h2>
+        <p id="form-subtitle" class="muted">Use your Control Center account.</p>
+        <div class="field">
+          <label for="username">Username</label>
+          <input class="input" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+          <span id="password-hint" class="field-hint" hidden>At least 8 characters.</span>
+        </div>
+        <div id="form-error" class="login-error" role="alert" hidden></div>
+        <button class="btn btn-primary btn-lg btn-block" id="submit-btn" type="submit">Sign in</button>
+      </form>
+      <footer class="login-footer">© Lipsia Digital GmbH</footer>
+    </section>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>
