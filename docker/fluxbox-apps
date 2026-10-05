@@ -1,0 +1,4 @@
+[app] (name=.*) (class=.*)
+  [Maximized]	{yes}
+  [Deco]	{NONE}
+[end]

@@ -1,0 +1,5 @@
+# Window manager for the Live View displays: the browser covers the whole framebuffer.
+session.screen0.toolbar.visible: false
+session.screen0.fullMaximization: true
+session.screen0.defaultDeco: NONE
+session.screen0.workspaces: 1
