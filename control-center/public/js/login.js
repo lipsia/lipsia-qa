@@ -34,6 +34,7 @@
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.hidden = false;
+      CC.replay(errorEl, 'login-error');
       submitBtn.disabled = false;
     }
   });

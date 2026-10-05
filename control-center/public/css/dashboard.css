@@ -61,3 +61,8 @@
 @media (max-width: 1080px) {
   .dash-grid { grid-template-columns: 1fr; }
 }
+
+.chart .bar-in { transform-box: view-box; transform-origin: 0 var(--baseline); animation: grow-y 0.8s var(--ease-out) both; animation-delay: calc(var(--i) * 14ms); }
+@keyframes grow-y { from { transform: scaleY(0); } }
+.kpi { transition: transform 0.3s var(--ease-out), box-shadow 0.3s ease; }
+.kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow); }

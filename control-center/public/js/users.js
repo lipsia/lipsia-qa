@@ -35,6 +35,7 @@
           </td>
         </tr>`;
     }).join('') || '<tr><td colspan="5" class="empty">No users yet.</td></tr>';
+    CC.stagger(rowsEl.querySelectorAll('tr'));
   }
 
   async function load() {

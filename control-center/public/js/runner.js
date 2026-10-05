@@ -1,5 +1,5 @@
 (async function () {
-  const { api, html, escapeHtml, toast, confirmDialog, formatDuration, debounce, readPref, writePref } = CC;
+  const { api, html, escapeHtml, toast, confirmDialog, formatDuration, debounce, readPref, writePref, stagger, replay } = CC;
   await CC.initShell('runner');
 
   const PREFS_KEY = 'cc-runner-prefs';
@@ -59,7 +59,7 @@
   }
 
   function openSpecList(open) {
-    specList.hidden = !open;
+    specList.classList.toggle('open', open);
     specInput.setAttribute('aria-expanded', String(open));
     if (open) {
       activeIndex = -1;
@@ -78,12 +78,12 @@
   }
 
   specInput.addEventListener('focus', () => { specInput.select(); openSpecList(true); });
-  specInput.addEventListener('input', () => { activeIndex = 0; specList.hidden = false; renderSpecList(); });
+  specInput.addEventListener('input', () => { activeIndex = 0; specList.classList.add('open'); renderSpecList(); });
   specInput.addEventListener('keydown', (e) => {
     const items = filteredSpecs();
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
-      specList.hidden = false;
+      specList.classList.add('open');
       activeIndex = Math.max(0, Math.min(items.length - 1, activeIndex + (e.key === 'ArrowDown' ? 1 : -1)));
       renderSpecList();
       const el = specList.querySelector('.combobox-option.active');
@@ -128,7 +128,11 @@
     if (!btn) return;
     prefs.stage = btn.dataset.stage;
     savePrefs();
-    renderStages();
+    $('stage-picker').querySelectorAll('[data-stage]').forEach((el) => {
+      const active = el.dataset.stage === prefs.stage;
+      el.classList.toggle('active', active);
+      el.setAttribute('aria-checked', String(active));
+    });
     refreshPreview();
   });
 
@@ -140,25 +144,48 @@
       const saved = prefs.cutoffs[suite.suite];
       const cutoff = suite.steps.some((s) => s.key === saved) ? saved : suite.steps[suite.steps.length - 1].key;
       const cutoffIdx = suite.steps.findIndex((s) => s.key === cutoff);
-      const full = cutoffIdx === suite.steps.length - 1;
       return `
         <div class="step-suite" data-suite="${escapeHtml(suite.suite)}">
-          <h4><span>${escapeHtml(suite.label)}</span><span class="badge ${full ? 'badge-brand' : ''}">${full ? 'Full run' : `${cutoffIdx + 1} of ${suite.steps.length} steps`}</span></h4>
+          <h4><span>${escapeHtml(suite.label)}</span><span class="badge step-badge"></span></h4>
           <ol class="step-list">
             ${suite.steps.map((s, i) => `
-              <li data-key="${escapeHtml(s.key)}" class="${i <= cutoffIdx ? 'included' : ''} ${i === cutoffIdx ? 'cutoff' : ''}" title="Run up to this step">
+              <li data-key="${escapeHtml(s.key)}" style="--i:${i}" title="Run up to this step">
                 <span class="step-num">${i + 1}</span><span>${escapeHtml(s.label)}</span>
               </li>`).join('')}
           </ol>
         </div>`;
     }).join('');
+    $('step-suites').querySelectorAll('.step-suite').forEach((el) => {
+      const suite = suites.find((s) => s.suite === el.dataset.suite);
+      const saved = prefs.cutoffs[suite.suite];
+      markCutoff(el, suite.steps.some((s) => s.key === saved) ? saved : suite.steps[suite.steps.length - 1].key, false);
+    });
   }
+
+  function markCutoff(suiteEl, key, animate = true) {
+    const items = [...suiteEl.querySelectorAll('li[data-key]')];
+    const cutoffIdx = items.findIndex((li) => li.dataset.key === key);
+    const previousIdx = items.findIndex((li) => li.classList.contains('cutoff'));
+    items.forEach((li, i) => {
+      // The cascade runs outward from the previous cutoff.
+      li.style.setProperty('--d', animate ? Math.abs(i - previousIdx) : 0);
+      li.classList.toggle('included', i <= cutoffIdx);
+      li.classList.toggle('cutoff', i === cutoffIdx);
+    });
+    const full = cutoffIdx === items.length - 1;
+    const badge = suiteEl.querySelector('.step-badge');
+    badge.textContent = full ? 'Full run' : `${cutoffIdx + 1} of ${items.length} steps`;
+    badge.classList.toggle('badge-brand', full);
+    if (animate) replay(badge, 'pop');
+  }
+
   $('step-suites').addEventListener('click', (e) => {
     const li = e.target.closest('li[data-key]');
     if (!li) return;
-    prefs.cutoffs[li.closest('[data-suite]').dataset.suite] = li.dataset.key;
+    const suiteEl = li.closest('[data-suite]');
+    prefs.cutoffs[suiteEl.dataset.suite] = li.dataset.key;
     savePrefs();
-    renderSteps();
+    markCutoff(suiteEl, li.dataset.key);
     refreshPreview();
   });
 
@@ -182,7 +209,9 @@
     if (!state.options.liveViewAvailable) {
       $('headed-hint').textContent = 'Opens the browser on this machine (no live view stream available here).';
     }
-    document.querySelectorAll('#speed button').forEach((b) => b.classList.toggle('active', Number(b.dataset.delay) === prefs.delay));
+    const speeds = [...document.querySelectorAll('#speed button')];
+    if (!speeds.some((b) => Number(b.dataset.delay) === prefs.delay)) prefs.delay = 0;
+    speeds.forEach((b) => b.classList.toggle('active', Number(b.dataset.delay) === prefs.delay));
     syncParallelLock();
   }
 
@@ -264,7 +293,7 @@
       toast(err.message, 'error', 7000);
     } finally {
       btn.disabled = false;
-      $('run-btn-label').textContent = 'Start run';
+      $('run-btn-label').innerHTML = `${CC.ICONS.play.replace('<svg', '<svg class="btn-icon-nudge"')} Start run`;
     }
   }
   $('run-btn').addEventListener('click', startRun);
@@ -295,6 +324,7 @@
     const cls = { running: 'badge-brand', passed: 'badge-success', failed: 'badge-danger' }[kind] || '';
     $('output-status').innerHTML = label
       ? `<span class="badge ${cls}">${kind === 'running' ? '<span class="dot dot-pulse"></span>' : ''}${escapeHtml(label)}</span>` : '';
+    replay($('output-status').firstElementChild, 'pop');
   }
 
   function appendOutput(text, isError) {
@@ -377,6 +407,8 @@
       </div>`;
   }
 
+  const seenProcesses = new Set();
+
   async function refreshProcesses() {
     try {
       const { processes, limit } = await api('/processes');
@@ -391,6 +423,9 @@
       }
       list.innerHTML = mine.map(processRow).join('')
         + (others.length ? `<div class="process-section">Other users</div>${others.map(processRow).join('')}` : '');
+      // Only runs that just appeared slide in; polling re-renders the rest silently.
+      stagger([...list.querySelectorAll('.process')].filter((el) => !seenProcesses.has(el.dataset.id)));
+      processes.forEach((p) => seenProcesses.add(String(p.id)));
     } catch { /* retried on next poll */ }
   }
 

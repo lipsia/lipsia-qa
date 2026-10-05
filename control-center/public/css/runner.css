@@ -18,6 +18,16 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
+  visibility: hidden;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0 round var(--radius));
+  transition: clip-path 0.3s var(--ease-expo), opacity 0.2s ease, visibility 0s linear 0.3s;
+}
+.combobox-list.open {
+  visibility: visible;
+  opacity: 1;
+  clip-path: inset(0 0 0 0 round var(--radius));
+  transition: clip-path 0.45s var(--ease-expo), opacity 0.2s ease;
 }
 .combobox-group {
   padding: 8px 10px 4px;
@@ -27,10 +37,10 @@
   text-transform: uppercase;
   color: var(--text-faint);
 }
-.combobox-option { padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; }
+.combobox-option { padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: background-color 0.15s ease, padding 0.2s var(--ease-out); }
 .combobox-option small { display: block; color: var(--text-faint); font-family: var(--font-mono); font-size: 11px; }
 .combobox-option.wildcard { color: var(--brand); }
-.combobox-option.active, .combobox-option:hover { background: var(--brand-soft); }
+.combobox-option.active, .combobox-option:hover { background: var(--brand-soft); padding-left: 14px; }
 .combobox-empty { padding: 12px 10px; color: var(--text-muted); }
 
 /* Stage picker */
@@ -48,9 +58,10 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  transition: border-color 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease, transform 0.25s var(--ease-spring);
 }
-.stage-option:hover { border-color: var(--brand); }
+.stage-option:hover { border-color: var(--brand); transform: translateY(-2px); }
+.stage-option:active { transform: scale(0.97); }
 .stage-option strong { font-weight: 500; }
 .stage-option span { font-size: 11.5px; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage-option.active { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand) inset; }
@@ -68,9 +79,11 @@
   border-bottom: 1px solid var(--border);
   font-size: 13px;
   color: var(--text-faint);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  transition-delay: calc(var(--d, 0) * 28ms);
 }
 .step-list li:last-child { border-bottom: 0; }
-.step-list li:hover { background: var(--surface-2); }
+.step-list li:hover { background: var(--surface-2); transition-delay: 0s; }
 .step-list li.included { color: var(--text); }
 .step-list li.cutoff { background: var(--brand-soft); font-weight: 500; }
 .step-num {
@@ -82,10 +95,15 @@
   border-radius: 50%;
   border: 1px solid var(--border-strong);
   font-size: 11px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.45s var(--ease-spring);
+  transition-delay: inherit;
 }
-.step-list li.included .step-num { border-color: var(--brand); background: var(--brand); color: #fff; }
+.step-list li.included .step-num { border-color: var(--seg-thumb); background: var(--seg-thumb); color: #fff; }
+.step-list li.cutoff .step-num { transform: scale(1.15); }
 
-.command-preview summary { cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+.command-preview summary { cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--text-muted); transition: color 0.2s ease; }
+.command-preview summary:hover { color: var(--text); }
+.command-preview[open] pre { animation: fade-up 0.4s var(--ease-out); }
 .command-preview pre {
   margin: 10px 0 0;
   padding: 12px;
@@ -97,7 +115,7 @@
 }
 
 /* Processes */
-.process { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.process { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border); transition: background-color 0.3s ease; }
 .process:last-child { border-bottom: 0; }
 .process.watching { background: color-mix(in srgb, var(--brand-soft) 60%, transparent); }
 .process-main { flex: 1; min-width: 0; }
@@ -114,3 +132,5 @@
 @media (max-width: 1080px) {
   .runner-grid { grid-template-columns: 1fr; }
 }
+
+.terminal > span:last-child { animation: fade-in 0.35s ease-out; }

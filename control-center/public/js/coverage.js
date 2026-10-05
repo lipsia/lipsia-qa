@@ -1,5 +1,5 @@
 (async function () {
-  const { api, escapeHtml, toast, openModal, confirmDialog, formatDateTime, ICONS } = CC;
+  const { api, escapeHtml, toast, openModal, confirmDialog, formatDateTime, ICONS, reveal, replay } = CC;
   const me = await CC.initShell('coverage');
 
   const STATUS_LABELS = {
@@ -27,9 +27,15 @@
     $('summary-percent').textContent = `${items.length ? Math.round((counts.done / items.length) * 100) : 0}%`;
     $('summary-legend').innerHTML = statuses.map((s) =>
       `<span><span class="dot" style="color:${statusColor(s)}"></span>${STATUS_LABELS[s]} ${counts[s] || 0}</span>`).join('');
-    $('summary-bar').innerHTML = total
-      ? statuses.map((s) => `<span style="width:${((counts[s] || 0) / total) * 100}%;background:${statusColor(s)}"></span>`).join('')
-      : '';
+    // Segments are created once and only resized, so changes animate smoothly.
+    const bar = $('summary-bar');
+    if (bar.children.length !== statuses.length) {
+      bar.innerHTML = statuses.map((s) => `<span data-status="${s}" style="width:0;background:${statusColor(s)}"></span>`).join('');
+      void bar.offsetWidth;
+    }
+    statuses.forEach((s) => {
+      bar.querySelector(`[data-status="${s}"]`).style.width = total ? `${((counts[s] || 0) / total) * 100}%` : '0';
+    });
   }
 
   // ── Groups ─────────────────────────────────────────────────────────────
@@ -48,6 +54,8 @@
     return { done, total: relevant.length, pct: relevant.length ? (done / relevant.length) * 100 : 0 };
   }
 
+  let firstRender = true;
+
   function render() {
     renderSummary();
     if (!groups.length) {
@@ -64,7 +72,7 @@
         <section class="card">
           <div class="card-head">
             <div class="group-head"><h2>${escapeHtml(g.group)}</h2><span class="badge">${g.items.length}</span></div>
-            <div class="group-head"><span class="hint">${p.done}/${p.total} done</span><div class="progress"><span style="width:${p.pct}%;background:var(--success)"></span></div></div>
+            <div class="group-head"><span class="hint">${p.done}/${p.total} done</span><div class="progress"><span class="${firstRender ? 'grow-x' : ''}" style="width:${p.pct}%;background:var(--success)"></span></div></div>
           </div>
           <div class="card-body flush table-wrap">
             <table class="table coverage-table">
@@ -92,6 +100,8 @@
       groups = data.groups;
       statuses = data.statuses;
       render();
+      reveal($('groups'), ':scope > .card');
+      firstRender = false;
     } catch (err) {
       toast(err.message, 'error');
     }
@@ -127,7 +137,10 @@
   $('groups').addEventListener('change', async (e) => {
     const select = e.target.closest('select[data-field="status"]');
     if (!select) return;
-    if (await save(select.closest('tr').dataset.id, { status: select.value })) render();
+    const id = select.closest('tr').dataset.id;
+    if (!(await save(id, { status: select.value }))) return;
+    render();
+    replay($('groups').querySelector(`tr[data-id="${id}"] .status-select`), 'pop');
   });
 
   $('groups').addEventListener('click', async (e) => {

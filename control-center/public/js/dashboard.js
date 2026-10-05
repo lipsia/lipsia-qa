@@ -1,5 +1,5 @@
 (async function () {
-  const { api, escapeHtml, toast, openModal, formatDuration, formatDateTime, debounce, readPref, writePref } = CC;
+  const { api, escapeHtml, toast, openModal, formatDuration, formatDateTime, debounce, readPref, writePref, countUp, stagger, reveal } = CC;
   await CC.initShell('dashboard');
 
   const PREFS_KEY = 'cc-dashboard-prefs';
@@ -23,14 +23,20 @@
     const duration = stats.reduce((n, s) => n + s.totalDurationMs, 0);
     const headed = stats.reduce((n, s) => n + s.headedRuns, 0);
     const rate = total ? Math.round((passed / total) * 100) : 0;
-    const kpi = (label, value, sub, accent) => `
-      <div class="card kpi ${accent ? 'accent' : ''}"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div><div class="kpi-sub">${sub}</div></div>`;
+    const kpi = (label, sub, accent) => `
+      <div class="card kpi ${accent ? 'accent' : ''}"><div class="kpi-label">${label}</div><div class="kpi-value">0</div><div class="kpi-sub">${sub}</div></div>`;
     $('kpis').innerHTML = [
-      kpi('Total runs', total.toLocaleString(), `${headed} with live view`, true),
-      kpi('Success rate', `${rate}%`, `${passed} passed · ${total - passed} failed`),
-      kpi('Test time', formatDuration(duration), total ? `Ø ${formatDuration(duration / total)} per run` : '–'),
-      kpi('Active users', stats.length, 'with at least one run'),
+      kpi('Total runs', `${headed} with live view`, true),
+      kpi('Success rate', `${passed} passed · ${total - passed} failed`),
+      kpi('Test time', total ? `Ø ${formatDuration(duration / total)} per run` : '–'),
+      kpi('Active users', 'with at least one run'),
     ].join('');
+    const values = $('kpis').querySelectorAll('.kpi-value');
+    countUp(values[0], total);
+    countUp(values[1], rate, { format: (v) => `${Math.round(v)}%` });
+    countUp(values[2], duration, { format: formatDuration });
+    countUp(values[3], stats.length);
+    reveal($('kpis'), '.kpi');
   }
 
   function renderPerUser(stats) {
@@ -39,13 +45,13 @@
       return;
     }
     const max = Math.max(...stats.map((s) => s.totalRuns));
-    $('per-user').innerHTML = `<div class="user-bars">${stats.slice(0, 12).map((s) => `
+    $('per-user').innerHTML = `<div class="user-bars">${stats.slice(0, 12).map((s, i) => `
       <div>
         <div class="user-bar-head">
           <span><strong>${escapeHtml(s.username)}</strong>${s.tag ? ` <span class="badge">${TAG_LABELS[s.tag] || s.tag}</span>` : ''}</span>
           <span class="muted nowrap">${s.totalRuns} runs · ${s.totalRuns ? Math.round((s.successRuns / s.totalRuns) * 100) : 0}%</span>
         </div>
-        <div class="progress" style="width:${Math.max(6, (s.totalRuns / max) * 100)}%">
+        <div class="progress grow-x" style="--i:${i};width:${Math.max(6, (s.totalRuns / max) * 100)}%">
           <span style="width:${(s.successRuns / s.totalRuns) * 100}%;background:var(--success)"></span>
           <span style="width:${(s.failedRuns / s.totalRuns) * 100}%;background:var(--danger)"></span>
         </div>
@@ -60,7 +66,7 @@
   }
 
   // ── Timeseries ─────────────────────────────────────────────────────────
-  function renderTimeseries(points) {
+  function renderTimeseries(points, animate = true) {
     const el = $('timeseries');
     const W = Math.max(320, el.clientWidth);
     const H = el.clientHeight || 240;
@@ -86,12 +92,14 @@
         ? `<text x="${x + barW / 2}" y="${H - 6}" text-anchor="middle">${new Date(p.day).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}</text>` : '';
       return `
         <rect class="hit" x="${pad.left + slot * i}" y="${pad.top}" width="${slot}" height="${innerH}" data-i="${i}"/>
+        <g class="bar ${animate ? 'bar-in' : ''}" style="--i:${i}">
         ${p.successRuns ? `<rect class="bar-passed" x="${x}" y="${passedTop}" width="${barW}" height="${y(0) - passedTop}" rx="2" pointer-events="none"/>` : ''}
         ${p.failedRuns ? `<rect class="bar-failed" x="${x}" y="${failedTop}" width="${barW}" height="${passedTop - failedTop}" rx="2" pointer-events="none"/>` : ''}
+        </g>
         <g class="axis">${label}</g>`;
     }).join('');
 
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Runs per day"><g class="grid axis">${grid}</g>${bars}</svg>`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Runs per day" style="--baseline:${y(0)}px"><g class="grid axis">${grid}</g>${bars}</svg>`;
     el.querySelectorAll('.hit').forEach((rect) => {
       rect.addEventListener('mousemove', (e) => {
         const p = points[Number(rect.dataset.i)];
@@ -110,7 +118,7 @@
     lastPoints = days;
     renderTimeseries(days);
   }
-  window.addEventListener('resize', debounce(() => renderTimeseries(lastPoints), 150));
+  window.addEventListener('resize', debounce(() => renderTimeseries(lastPoints, false), 150));
 
   // ── Recent runs ────────────────────────────────────────────────────────
   function resultCell(r) {
@@ -137,6 +145,7 @@
         <td class="num nowrap">${formatDuration(r.durationMs)}</td>
         <td>${r.failureReason || r.hasLog ? `<div class="reason"><span title="${escapeHtml(r.failureReason || '')}">${escapeHtml(r.failureReason || '')}</span>${r.hasLog ? `<button class="btn btn-sm" data-log="${r.id}" type="button">Log</button>` : ''}</div>` : '<span class="faint">–</span>'}</td>
       </tr>`).join('') || '<tr><td colspan="7" class="empty"><strong>No runs found</strong>Runs appear here once they have finished.</td></tr>';
+    stagger($('runs').querySelectorAll('tr'));
   }
 
   $('runs').addEventListener('click', async (e) => {

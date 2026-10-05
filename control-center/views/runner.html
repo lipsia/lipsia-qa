@@ -28,7 +28,7 @@
             <label for="spec-input">Test</label>
             <div class="combobox" id="spec-combobox">
               <input class="input" id="spec-input" placeholder="Search specs…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="spec-list">
-              <ul class="combobox-list" id="spec-list" role="listbox" hidden></ul>
+              <ul class="combobox-list" id="spec-list" role="listbox"></ul>
             </div>
             <span class="field-hint" id="spec-hint"></span>
           </div>
@@ -56,7 +56,7 @@
 
           <div class="field">
             <label>Speed</label>
-            <div class="segmented" id="speed">
+            <div class="segmented block" id="speed">
               <button type="button" data-delay="0">Instant</button>
               <button type="button" data-delay="500">Fast</button>
               <button type="button" data-delay="1500">Normal</button>
@@ -83,7 +83,7 @@
           </details>
 
           <button class="btn btn-primary btn-lg btn-block" id="run-btn" type="button" disabled>
-            <span id="run-btn-label">Start run</span>
+            <span id="run-btn-label"><svg class="btn-icon-nudge" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg> Start run</span>
           </button>
         </div>
       </section>

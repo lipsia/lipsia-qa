@@ -34,4 +34,5 @@ Nur im Container (Xvfb/x11vnc vorhanden → `displayPool.POOL_AVAILABLE`). Pro H
 - Code-Kommentare englisch und knapp: beschreiben, *was* und *warum*, keine Änderungshistorie.
 - UI-Texte englisch, Doku deutsch.
 - Farben/Abstände nur über die Tokens in `public/css/app.css` (Lipsia Digital: Indigo `#312782`, Orange-Verlauf `#ff7133 → #ff3834`, Rubik).
+- Motion: Easing-Tokens (`--ease-out`, `--ease-spring`, …) und Helfer in `common.js` (`CC.reveal`, `CC.stagger`, `CC.countUp`, `CC.replay`, `CC.segmented`) verwenden. Listen, die per Polling neu gerendert werden, nur für neue Einträge animieren. Alles muss unter `prefers-reduced-motion` ohne Animation funktionieren (globaler Block am Ende von `app.css`).
 - DB-Schema in `lib/db.js` (`CREATE TABLE IF NOT EXISTS`). Spätere Schemaänderungen brauchen eine Migration für bestehende Datenbanken.
