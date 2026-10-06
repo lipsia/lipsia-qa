@@ -16,6 +16,7 @@
   --border-strong: #cfcde0;
   --text: #0a0114;
   --text-muted: #625f75;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23625f75' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
   --text-faint: #8d8aa0;
 
   --success: #0f9e78;
@@ -66,6 +67,8 @@
     --border-strong: #3a3560;
     --text: #edecf7;
     --text-muted: #a9a6c2;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23a9a6c2' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23a9a6c2' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
     --text-faint: #7d7999;
     --success: #34d7a9;
     --success-soft: #0f3329;
@@ -106,6 +109,9 @@
 /* Base */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
+/* Always reserve the scrollbar, so the layout doesn't jump sideways when a page, a filter
+   or the entrance animation changes the page height (classic scrollbars take up width). */
+html { overflow-y: scroll; }
 body {
   font-family: var(--font);
   font-size: 14px;
@@ -346,6 +352,17 @@ textarea.input { height: auto; min-height: 80px; padding: 10px 12px; resize: ver
 .input:hover:not(:focus):not(:disabled) { border-color: color-mix(in srgb, var(--brand) 45%, var(--border-strong)); }
 .input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent); }
 .input-sm { height: 32px; font-size: 13px; padding: 0 10px; }
+/* Own chevron instead of the native one, which sits too close to the border. */
+select.input {
+  appearance: none;
+  padding-right: 36px;
+  background-image: var(--select-arrow);
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  cursor: pointer;
+}
+select.input-sm { padding-right: 32px; background-position: right 10px center; }
 .input-inline { border-color: transparent; background: transparent; }
 .input-inline:hover { border-color: var(--border); }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
@@ -451,7 +468,9 @@ textarea.input { height: auto; min-height: 80px; padding: 10px 12px; resize: ver
 @keyframes ring { 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 
 /* Tables */
-.table-wrap { overflow-x: auto; }
+/* Horizontal scrolling only. overflow-x alone makes the y-axis scrollable too, so rows sliding in
+   (Hub.stagger) would briefly add a vertical scrollbar and shift the columns when it goes. */
+.table-wrap { overflow-x: auto; overflow-y: hidden; }
 table.table { width: 100%; border-collapse: collapse; }
 .table th {
   text-align: left;
