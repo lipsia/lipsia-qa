@@ -13,6 +13,9 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
+// Fictional demo app (no login) to run the demo specs against — stage `demo` in cypress.env.json.
+app.use('/demo', express.static(path.join(__dirname, '..', 'demo-app')));
+
 // Pages: `admin` pages redirect non-admins to the runner.
 const PAGES = [
   { route: '/', file: 'runner.html' },

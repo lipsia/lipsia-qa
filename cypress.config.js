@@ -98,6 +98,10 @@ module.exports = defineConfig({
       PRIVATE_ENV_KEYS.forEach((key) => delete exposed[key])
       config.expose = { ...(config.expose || {}), ...exposed }
 
+      // The demo app is served by the E2E Hub itself (/demo), so the demo specs ignore the stage.
+      // The hub passes its PORT on to every run.
+      config.expose.demoBaseUrl = process.env.DEMO_BASE_URL || `http://localhost:${process.env.PORT || 9877}/demo`
+
       return config
     },
   },

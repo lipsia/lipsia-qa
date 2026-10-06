@@ -113,6 +113,20 @@ context('Checkout', () => {
 
 Details zu Feldern und Regeln stehen in den Kopfkommentaren von `cypress/step-catalog.js` und `cypress/support/stepFlow.js`. Per CLI: `--env checkoutLastStep=cart` (bis Step `cart`), `--env checkoutLastStep=none` (Trockenlauf).
 
+### Demo für Kundenpräsentationen
+
+`demo-app/` ist eine fiktive Mini-Anwendung (**Sunline CRM**: Login, Leads, Termin, Angebot, Abschluss), die der E2E Hub selbst unter `/demo` ausliefert — ohne Hub-Login, ohne Backend, alle Daten im `localStorage` des Browsers. Jeder Lauf startet daher mit denselben Seed-Daten. Zugang in der App: `demo` / `demo`.
+
+Die Demo ist **keine Umgebung** in `cypress.env.json`: Specs unter `cypress/e2e/demo/` laufen immer gegen die Demo-App des Hubs, egal welche Umgebung gewählt ist (der Hub setzt dafür `--config baseUrl=http://localhost:<PORT>/demo`, die Specs setzen dieselbe URL zusätzlich pro Suite; abweichend per `DEMO_BASE_URL`). Kategorie `cypress/e2e/demo/`:
+
+| Spec | Zeigt |
+|---|---|
+| `Login.cy.js`, `Lead-Search.cy.js`, `New-Lead.cy.js` | einfache grüne Specs |
+| `Sales-Process.cy.js` | Step-Suite `demoSalesProcess` — „Test steps“ im Hub, Lauf bis zu einem Step |
+| `Offer-Discounts.cy.js` | schlägt **absichtlich** fehl (eingebauter Bug bei `WELCOME50`): Failure-Reason, Log und Screenshot im Hub |
+
+Für die Präsentation: Kategorie „demo“ wählen, Live View an, Speed auf langsam — dann sieht man jeden Klick.
+
 ### Lokal ausführen
 
 ```bash

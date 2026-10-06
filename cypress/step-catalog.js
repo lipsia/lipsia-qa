@@ -30,4 +30,16 @@
  *     ],
  *   },
  */
-module.exports = {}
+module.exports = {
+  demoSalesProcess: {
+    spec: 'cypress/e2e/demo/Sales-Process.cy.js',
+    label: 'Demo · Sales process',
+    steps: [
+      { key: 'login', title: 'Log in', label: 'Log in', critical: true },
+      { key: 'lead', title: 'Create lead', label: 'Create lead', critical: true },
+      { key: 'visit', title: 'Schedule site visit', label: 'Schedule site visit' },
+      { key: 'offer', title: 'Send offer', label: 'Send offer', group: 'offer' },
+      { key: 'won', title: 'Mark lead as won', label: 'Mark lead as won', requires: ['offer'] },
+    ],
+  },
+}

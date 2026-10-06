@@ -72,6 +72,11 @@ function normalizeRequest(body = {}) {
   return { spec, stage, browser, headed, delay, parallel, recordVideo: Boolean(body.recordVideo), stepCutoffs };
 }
 
+// Demo specs target the demo app served by this hub (see demo-app/), whatever stage is
+// selected. Setting baseUrl also stops Cypress from waiting for the stage's server.
+const DEMO_SPEC_DIR = 'cypress/e2e/demo/';
+const DEMO_BASE_URL = process.env.DEMO_BASE_URL || `http://localhost:${process.env.PORT || 9877}/demo`;
+
 function buildArgs(opts, processId) {
   const envPairs = [`systemUnderTest=${opts.stage.name}`];
   if (opts.delay > 0) envPairs.push(`delay=${opts.delay}`);
@@ -82,6 +87,7 @@ function buildArgs(opts, processId) {
   args.push('--env', envPairs.join(','));
   const configParts = [`video=${opts.recordVideo}`];
   if (opts.recordVideo) configParts.push(`videosFolder=test-reports/videos/run-${processId}`);
+  if (opts.spec.startsWith(DEMO_SPEC_DIR)) configParts.push(`baseUrl=${DEMO_BASE_URL}`);
   args.push('--config', configParts.join(','));
   return args;
 }
