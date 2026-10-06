@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "license": "UNLICENSED",
-  "description": "Cypress end-to-end test framework with a web-based Control Center",
+  "description": "Cypress end-to-end test framework with a web-based E2E Hub",
   "author": "Lipsia Digital GmbH",
   "engines": {
     "node": ">=24"
@@ -11,7 +11,7 @@
   "scripts": {
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run",
-    "control-center": "node control-center/server.js",
+    "e2e-hub": "node e2e-hub/server.js",
     "user": "node scripts/manage-user.js"
   },
   "dependencies": {

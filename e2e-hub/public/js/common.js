@@ -1,7 +1,7 @@
-// Shared helpers for all Control Center pages.
+// Shared helpers for all E2E Hub pages.
 (function () {
-  const THEME_KEY = 'cc-theme';
-  const USER_KEY = 'cc-user';
+  const THEME_KEY = 'e2e-hub-theme';
+  const USER_KEY = 'e2e-hub-user';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const ICONS = {
@@ -33,38 +33,12 @@
     root.classList.toggle('is-dark', effectiveTheme() === 'dark');
   }
 
-  // Animated switch: a circle grows from the toggle where View Transitions exist, else colours fade.
-  let themeFadeTimer;
-  function toggleTheme(event) {
+  // Short cross-fade between the two themes where View Transitions exist, else an instant switch.
+  function toggleTheme() {
     const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem(THEME_KEY, next); } catch { /* storage unavailable */ }
-    const root = document.documentElement;
-
-    if (reduceMotion.matches) return applyTheme(next);
-    if (!document.startViewTransition) {
-      root.classList.add('theme-fade');
-      applyTheme(next);
-      clearTimeout(themeFadeTimer);
-      themeFadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 500);
-      return;
-    }
-
-    const transition = document.startViewTransition(() => {
-      root.classList.add('theme-switching');
-      applyTheme(next);
-    });
-    transition.finished.catch(() => {}).finally(() => root.classList.remove('theme-switching'));
-
-    const r = event.currentTarget.getBoundingClientRect();
-    const x = r.left + r.width / 2;
-    const y = r.top + r.height / 2;
-    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-    transition.ready.then(() => {
-      root.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        { duration: 700, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
-      );
-    }).catch(() => {});
+    if (reduceMotion.matches || !document.startViewTransition) return applyTheme(next);
+    document.startViewTransition(() => applyTheme(next));
   }
   applyTheme(storedTheme());
 
@@ -218,10 +192,7 @@
     const header = html(`
       <header class="app-header">
         <div class="app-header-inner">
-          <a class="brand" href="/" aria-label="Lipsia Digital QA Control Center">
-            <img src="/assets/logo-white.svg" alt="Lipsia Digital">
-            <span class="brand-product">QA Control Center</span>
-          </a>
+          <a class="brand" href="/" aria-label="Lipsia Digital E2E Hub – Test Runner"><img src="/assets/logo-white.svg" alt="Lipsia Digital"></a>
           <nav class="app-nav">${nav}</nav>
           <div class="header-actions">
             <button class="icon-btn theme-toggle" data-theme-toggle title="Toggle light / dark mode" aria-label="Toggle theme">
@@ -260,18 +231,13 @@
     onScroll();
   }
 
-  function animatePageHead() {
-    const h1 = document.querySelector('.page-head h1');
-    if (h1 && !h1.querySelector('.rise')) h1.innerHTML = `<span class="rise">${h1.innerHTML}</span>`;
-  }
-
   /**
    * Renders the header and verifies the session. The header is drawn immediately from the
    * cached user so page transitions don't flash; /login is loaded when there is no session.
    */
   async function initShell(active) {
-    animatePageHead();
-    reveal();
+    // Only content below the fold animates on load; hiding what is already painted would flicker.
+    reveal(document, REVEAL_SELECTOR, { belowFold: true });
     let cached = null;
     try { cached = JSON.parse(sessionStorage.getItem(USER_KEY) || 'null'); } catch { /* ignore */ }
     if (cached) renderHeader(cached, active);
@@ -293,10 +259,18 @@
   const REVEAL_SELECTOR = '.page > section, .runner-grid > .card, .runner-grid > .stack > .card, .kpis > .card, .dash-grid > .card, #groups > .card';
   let revealObserver = null;
 
-  /** Fades elements up as they enter the viewport, staggered by their order. */
-  function reveal(root = document, selector = REVEAL_SELECTOR) {
-    const els = [...root.querySelectorAll(selector)].filter((el) => !el.classList.contains('reveal'));
-    if (!els.length || reduceMotion.matches || !('IntersectionObserver' in window)) return;
+  /**
+   * Animates freshly rendered elements in: those in view right away (staggered), those below
+   * the fold once scrolled into view. With `belowFold`, elements in view are left alone
+   * (used on page load, where the CSS page entrance already covers them).
+   */
+  function reveal(root = document, selector = REVEAL_SELECTOR, { belowFold = false } = {}) {
+    if (reduceMotion.matches) return;
+    const els = [...root.querySelectorAll(selector)].filter((el) => !el.classList.contains('reveal') && !el.classList.contains('anim-in'));
+    const inView = els.filter((el) => el.getBoundingClientRect().top < innerHeight);
+    const below = els.filter((el) => !inView.includes(el));
+    if (!belowFold) stagger(inView);
+    if (!below.length || !('IntersectionObserver' in window)) return;
     if (!revealObserver) {
       revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -306,13 +280,11 @@
         });
       }, { rootMargin: '0px 0px -6% 0px' });
     }
-    els.forEach((el, i) => {
-      el.style.setProperty('--reveal-delay', `${Math.min(i, 6) * 70}ms`);
+    below.forEach((el, i) => {
+      el.style.setProperty('--i', Math.min(i, 3));
       el.classList.add('reveal');
     });
-    // Commit the hidden start state, otherwise elements already in view would skip the transition.
-    void document.body.offsetWidth;
-    els.forEach((el) => revealObserver.observe(el));
+    below.forEach((el) => revealObserver.observe(el));
   }
 
   /** Staggered entry animation for freshly rendered children (rows, list items). */
@@ -406,7 +378,7 @@
     try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
   }
 
-  window.CC = {
+  window.Hub = {
     ICONS,
     api,
     html,

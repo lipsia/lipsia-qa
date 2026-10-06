@@ -3,7 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in · QA Control Center</title>
+  <title>Sign in · E2E Hub</title>
+  <script>
+    // Apply the stored theme before first paint so navigation doesn't flash the other theme.
+    try {
+      const t = localStorage.getItem('e2e-hub-theme');
+      if (t) document.documentElement.dataset.theme = t;
+      if ((t || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark') document.documentElement.classList.add('is-dark');
+    } catch { /* storage unavailable */ }
+  </script>
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +24,7 @@
     <section class="login-brand">
       <img src="/assets/logo-white.svg" alt="Lipsia Digital" class="login-logo">
       <div class="login-claim">
-        <h1><span>QA Control Center</span></h1>
+        <h1><span>E2E Hub</span></h1>
         <p>Run, watch and track end-to-end tests across your environments.</p>
       </div>
       <ul class="login-points">
@@ -29,7 +37,7 @@
     <section class="login-panel">
       <form id="login-form" class="login-form" novalidate>
         <h2 id="form-title">Sign in</h2>
-        <p id="form-subtitle" class="muted">Use your Control Center account.</p>
+        <p id="form-subtitle" class="muted">Use your E2E Hub account.</p>
         <div class="field">
           <label for="username">Username</label>
           <input class="input" id="username" name="username" autocomplete="username" required>

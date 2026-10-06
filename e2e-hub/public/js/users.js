@@ -1,10 +1,11 @@
 (async function () {
-  const { api, escapeHtml, toast, openModal, confirmDialog, changePasswordDialog, formatDateTime } = CC;
-  const me = await CC.initShell('users');
+  const { api, escapeHtml, toast, openModal, confirmDialog, changePasswordDialog, formatDateTime } = Hub;
+  const me = await Hub.initShell('users');
 
   const TAG_LABELS = { po: 'Product Owner', dev: 'Developer' };
   const rowsEl = document.getElementById('user-rows');
   let tags = [];
+  let rendered = false;
 
   const tagOptions = (selected) => ['<option value="">—</option>']
     .concat(tags.map((t) => `<option value="${t}" ${t === selected ? 'selected' : ''}>${TAG_LABELS[t] || t}</option>`)).join('');
@@ -35,7 +36,9 @@
           </td>
         </tr>`;
     }).join('') || '<tr><td colspan="5" class="empty">No users yet.</td></tr>';
-    CC.stagger(rowsEl.querySelectorAll('tr'));
+    // Animate only the first load; re-renders after an edit would make the whole table blink.
+    if (!rendered) Hub.stagger(rowsEl.querySelectorAll('tr'));
+    rendered = true;
   }
 
   async function load() {

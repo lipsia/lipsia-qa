@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db } = require('./db');
 
-const COOKIE_NAME = 'cc_session';
+const COOKIE_NAME = 'e2e_hub_session';
 const SESSION_TTL_SECONDS = 12 * 60 * 60;
 const MIN_PASSWORD_LENGTH = 8;
 const ROLES = ['admin', 'user'];

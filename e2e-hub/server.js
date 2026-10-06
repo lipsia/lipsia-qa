@@ -45,7 +45,7 @@ app.use('/api', require('./routes/runs'));
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
 
-app.listen(PORT, () => console.log(`[Control Center] Listening on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`[E2E Hub] Listening on http://localhost:${PORT}`));
 
 const shutdown = () => {
   runner.shutdown();

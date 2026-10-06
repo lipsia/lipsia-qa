@@ -1,6 +1,6 @@
 # Lipsia QA
 
-End-to-End-Testframework auf Basis von **Cypress 16** mit einem webbasierten **QA Control Center**, über das Specs gegen verschiedene Umgebungen gestartet, live verfolgt und ausgewertet werden.
+End-to-End-Testframework auf Basis von **Cypress 16** mit einem webbasierten **E2E Hub**, über den Specs gegen verschiedene Umgebungen gestartet, live verfolgt und ausgewertet werden.
 
 - **Test Runner** — Spec und Umgebung wählen, Optionen setzen (Browser, Geschwindigkeit, parallele Läufe, Live View, Video), Ausgabe live im Browser verfolgen.
 - **Live View** — Headed-Läufe laufen im Container in einem eigenen virtuellen Display und lassen sich read-only per noVNC beobachten.
@@ -16,7 +16,7 @@ Voraussetzungen: Node.js ≥ 24 (siehe `.nvmrc`), für den Container Docker mit 
 ```bash
 make setup            # npm ci, legt cypress.env.json und .env aus den Vorlagen an
 # cypress.env.json: baseUrls der Umgebungen eintragen
-make control-center   # http://localhost:9877
+make e2e-hub          # http://localhost:9877
 ```
 
 Beim ersten Aufruf fragt die Login-Seite nach einem Admin-Konto — der erste Account wird Administrator.
@@ -31,10 +31,10 @@ make logs
 
 | Port | Dienst |
 |---|---|
-| 9877 | Control Center |
+| 9877 | E2E Hub |
 | 6080 | noVNC-Gateway für die Live View |
 
-Standardmäßig werden beide Ports nur auf `127.0.0.1` veröffentlicht (`BIND_ADDRESS` in `.env`). Liegt das Control Center hinter einem Reverse Proxy, `TRUST_PROXY=1` setzen und die öffentliche Adresse des Live-View-Gateways in `VNC_PUBLIC_BASE_URL` eintragen.
+Standardmäßig werden beide Ports nur auf `127.0.0.1` veröffentlicht (`BIND_ADDRESS` in `.env`). Liegt der E2E Hub hinter einem Reverse Proxy, `TRUST_PROXY=1` setzen und die öffentliche Adresse des Live-View-Gateways in `VNC_PUBLIC_BASE_URL` eintragen.
 
 Gemountet werden `cypress.env.json` (read-only), das Verzeichnis `cypress/` (neue Specs erscheinen ohne Rebuild), `test-reports/` und ein Volume für die SQLite-Datenbank.
 
@@ -54,14 +54,14 @@ Vorlage: `cypress.env.example.json`. Die Datei ist in `.gitignore` und wird nich
 }
 ```
 
-- `systemUnderTest` — Standard-Umgebung für CLI-Läufe; das Control Center übergibt die gewählte Umgebung pro Lauf per `--env systemUnderTest=<name>`.
+- `systemUnderTest` — Standard-Umgebung für CLI-Läufe; der E2E Hub übergibt die gewählte Umgebung pro Lauf per `--env systemUnderTest=<name>`.
 - `stages.<name>.baseUrl` — wird zur Cypress-`baseUrl`, `cy.visit('/')` landet also auf der gewählten Umgebung. Weitere Felder pro Stage (API-URLs etc.) sind frei wählbar und über `cypress/support/stage.js` lesbar.
-- `protected: true` — das Control Center verlangt vor einem Lauf gegen diese Umgebung eine Bestätigung.
+- `protected: true` — der E2E Hub verlangt vor einem Lauf gegen diese Umgebung eine Bestätigung.
 - `secrets` — wird **nicht** in den Browser gespiegelt; in Specs per `secret('key')` aus `cypress/support/stage.js` lesen.
 
 ## Tests schreiben
 
-Specs liegen unter `cypress/e2e/<bereich>/…/*.cy.js`. Der erste Ordner unter `e2e/` ist die Kategorie, nach der das Control Center gruppiert; pro Kategorie gibt es zusätzlich den Eintrag „All specs in …“. Ordner und Dateien mit `_` oder `.` am Anfang werden ignoriert.
+Specs liegen unter `cypress/e2e/<bereich>/…/*.cy.js`. Der erste Ordner unter `e2e/` ist die Kategorie, nach der der E2E Hub gruppiert; pro Kategorie gibt es zusätzlich den Eintrag „All specs in …“. Ordner und Dateien mit `_` oder `.` am Anfang werden ignoriert.
 
 ```js
 import { stage, secret } from '../../support/stage'
@@ -74,11 +74,11 @@ describe('Startseite', () => {
 })
 ```
 
-`cy.terminalLog(text)` schreibt zusätzlich ins Terminal (sichtbar im Control Center und in CI-Logs).
+`cy.terminalLog(text)` schreibt zusätzlich ins Terminal (sichtbar im E2E Hub und in CI-Logs).
 
 ### Step-basierte Specs
 
-Für lange, fachliche Abläufe kann eine Spec in Steps zerlegt werden. Die Steps werden in `cypress/step-catalog.js` beschrieben; das Control Center bietet dann unter „Test steps“ an, nur bis zu einem bestimmten Step zu laufen.
+Für lange, fachliche Abläufe kann eine Spec in Steps zerlegt werden. Die Steps werden in `cypress/step-catalog.js` beschrieben; der E2E Hub bietet dann unter „Test steps“ an, nur bis zu einem bestimmten Step zu laufen.
 
 ```js
 // cypress/step-catalog.js
@@ -124,7 +124,7 @@ Reports landen in `test-reports/` (Mochawesome-HTML unter `html/`, JUnit-XML unt
 
 ## Benutzerverwaltung
 
-Im Control Center unter **Users** (nur Admins), alternativ per CLI:
+Im E2E Hub unter **Users** (nur Admins), alternativ per CLI:
 
 ```bash
 make user-add NAME=anna PASS='geheim123' ROLE=admin
@@ -135,13 +135,13 @@ make user-delete NAME=anna
 
 Mit dem Suffix `-docker` (z. B. `make user-list-docker`) laufen die Befehle im Container.
 
-## Umgebungsvariablen des Control Centers
+## Umgebungsvariablen des E2E Hubs
 
 | Variable | Standard | Bedeutung |
 |---|---|---|
 | `PORT` | `9877` | HTTP-Port |
 | `SESSION_SECRET` | zufällig | Signiert die Session-Cookies; ohne festen Wert enden Sessions beim Neustart |
-| `DB_FILE` | `data/control-center.sqlite` | SQLite-Datenbank (Nutzer, Laufhistorie, Coverage) |
+| `DB_FILE` | `data/e2e-hub.sqlite` | SQLite-Datenbank (Nutzer, Laufhistorie, Coverage) |
 | `TRUST_PROXY` | `0` | Anzahl vorgeschalteter Reverse Proxies |
 | `VNC_PUBLIC_BASE_URL` | – | Öffentliche URL des noVNC-Gateways |
 | `VNC_PUBLIC_PORT` | `6080` | Port des Gateways, wenn keine Base-URL gesetzt ist |
@@ -153,7 +153,7 @@ Mit dem Suffix `-docker` (z. B. `make user-list-docker`) laufen die Befehle im C
 ## Projektstruktur
 
 ```
-control-center/
+e2e-hub/
   server.js          Express-App, Seiten- und API-Routing
   lib/               auth, db, runner (Cypress-Prozesse), runReport, displayPool, usage, coverage, project
   routes/            REST-Endpunkte

@@ -5,12 +5,12 @@
   let bootstrap = false;
 
   try {
-    await CC.api('/auth/me');
+    await Hub.api('/auth/me');
     return location.replace('/');
   } catch { /* not signed in */ }
 
   try {
-    const { bootstrapNeeded } = await CC.api('/auth/bootstrap-status');
+    const { bootstrapNeeded } = await Hub.api('/auth/bootstrap-status');
     if (bootstrapNeeded) {
       bootstrap = true;
       document.getElementById('form-title').textContent = 'Create admin account';
@@ -26,7 +26,7 @@
     errorEl.hidden = true;
     submitBtn.disabled = true;
     try {
-      await CC.api(bootstrap ? '/auth/bootstrap' : '/auth/login', {
+      await Hub.api(bootstrap ? '/auth/bootstrap' : '/auth/login', {
         method: 'POST',
         body: { username: form.username.value.trim(), password: form.password.value },
       });
@@ -34,7 +34,7 @@
     } catch (err) {
       errorEl.textContent = err.message;
       errorEl.hidden = false;
-      CC.replay(errorEl, 'login-error');
+      Hub.replay(errorEl, 'login-error');
       submitBtn.disabled = false;
     }
   });

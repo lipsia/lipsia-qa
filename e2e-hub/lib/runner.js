@@ -124,7 +124,7 @@ function spawnRun({ processId, opts, user, batch, vncSession }) {
   const env = { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0', TERM: 'dumb' };
   if (vncSession) {
     env.DISPLAY = vncSession.display;
-    env.CC_SCREEN_GEOMETRY = `${displayPool.SCREEN_SIZE.width}x${displayPool.SCREEN_SIZE.height}`;
+    env.E2E_HUB_SCREEN_GEOMETRY = `${displayPool.SCREEN_SIZE.width}x${displayPool.SCREEN_SIZE.height}`;
   }
 
   const child = spawn('npx', ['cypress', ...args], { cwd: project.ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true, env });

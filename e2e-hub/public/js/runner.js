@@ -1,9 +1,9 @@
 (async function () {
-  const { api, html, escapeHtml, toast, confirmDialog, formatDuration, debounce, readPref, writePref, stagger, replay } = CC;
-  await CC.initShell('runner');
+  const { api, html, escapeHtml, toast, confirmDialog, formatDuration, debounce, readPref, writePref, stagger, replay } = Hub;
+  await Hub.initShell('runner');
 
-  const PREFS_KEY = 'cc-runner-prefs';
-  const LAST_RUN_KEY = 'cc-last-run';
+  const PREFS_KEY = 'e2e-hub-runner-prefs';
+  const LAST_RUN_KEY = 'e2e-hub-last-run';
   const prefs = { spec: '', stage: '', browser: 'electron', delay: 0, parallel: 1, headed: false, recordVideo: false, cutoffs: {}, ...readPref(PREFS_KEY, {}) };
   const savePrefs = () => writePref(PREFS_KEY, prefs);
 
@@ -293,7 +293,7 @@
       toast(err.message, 'error', 7000);
     } finally {
       btn.disabled = false;
-      $('run-btn-label').innerHTML = `${CC.ICONS.play.replace('<svg', '<svg class="btn-icon-nudge"')} Start run`;
+      $('run-btn-label').innerHTML = `${Hub.ICONS.play.replace('<svg', '<svg class="btn-icon-nudge"')} Start run`;
     }
   }
   $('run-btn').addEventListener('click', startRun);

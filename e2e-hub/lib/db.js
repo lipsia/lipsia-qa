@@ -2,9 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 
-const DB_FILE = process.env.DB_FILE || path.join(__dirname, '..', '..', 'data', 'control-center.sqlite');
+const DB_FILE = process.env.DB_FILE || path.join(__dirname, '..', '..', 'data', 'e2e-hub.sqlite');
 
 fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
+
+// Databases created before the rename to E2E Hub are picked up under the new name.
+const LEGACY_DB_FILE = path.join(path.dirname(DB_FILE), 'control-center.sqlite');
+if (!fs.existsSync(DB_FILE) && fs.existsSync(LEGACY_DB_FILE)) {
+  for (const suffix of ['', '-wal', '-shm']) {
+    if (fs.existsSync(LEGACY_DB_FILE + suffix)) fs.renameSync(LEGACY_DB_FILE + suffix, DB_FILE + suffix);
+  }
+}
 
 const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');

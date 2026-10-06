@@ -103,7 +103,7 @@
 
 .command-preview summary { cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--text-muted); transition: color 0.2s ease; }
 .command-preview summary:hover { color: var(--text); }
-.command-preview[open] pre { animation: fade-up 0.4s var(--ease-out); }
+.command-preview[open] pre { animation: enter var(--enter-duration) var(--enter-ease); }
 .command-preview pre {
   margin: 10px 0 0;
   padding: 12px;

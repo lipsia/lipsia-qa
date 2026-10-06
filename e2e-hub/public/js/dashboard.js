@@ -1,8 +1,8 @@
 (async function () {
-  const { api, escapeHtml, toast, openModal, formatDuration, formatDateTime, debounce, readPref, writePref, countUp, stagger, reveal } = CC;
-  await CC.initShell('dashboard');
+  const { api, escapeHtml, toast, openModal, formatDuration, formatDateTime, debounce, readPref, writePref, countUp, stagger, reveal } = Hub;
+  await Hub.initShell('dashboard');
 
-  const PREFS_KEY = 'cc-dashboard-prefs';
+  const PREFS_KEY = 'e2e-hub-dashboard-prefs';
   const prefs = { tag: '', days: 30, ...readPref(PREFS_KEY, {}) };
   const $ = (id) => document.getElementById(id);
   const tooltip = $('tooltip');

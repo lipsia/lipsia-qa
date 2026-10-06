@@ -33,7 +33,7 @@ ENV DISPLAY=:99 \
     DISPLAY_POOL_START=100 \
     DISPLAY_POOL_SIZE=20 \
     NOVNC_TOKEN_FILE=/tmp/novnc-tokens \
-    DB_FILE=/app/data/control-center.sqlite
+    DB_FILE=/app/data/e2e-hub.sqlite
 
 VOLUME ["/app/data"]
 

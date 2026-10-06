@@ -1,6 +1,6 @@
 /**
  * Logs to the Cypress command log and, in headless runs, to the terminal as well — so the
- * message shows up in the Control Center output and in CI logs.
+ * message shows up in the E2E Hub output and in CI logs.
  * @param {string} text
  */
 Cypress.Commands.add('terminalLog', (text) => {

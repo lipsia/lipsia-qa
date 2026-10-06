@@ -1,8 +1,8 @@
 const { defineConfig } = require('cypress')
 
-// Marker line the Control Center parses from stdout to build run results (see
-// control-center/lib/runReport.js). Must stay in sync with SPEC_REPORT_MARKER there.
-const SPEC_REPORT_MARKER = '[cc:spec-report]'
+// Marker line the E2E Hub parses from stdout to build run results (see
+// e2e-hub/lib/runReport.js). Must stay in sync with SPEC_REPORT_MARKER there.
+const SPEC_REPORT_MARKER = '[e2e-hub:spec-report]'
 
 // Keys of cypress.env.json that are NOT mirrored into `expose` and therefore never reach the
 // browser bundle synchronously. Read them in specs via `cy.env(['secrets'])`.
@@ -75,7 +75,7 @@ module.exports = defineConfig({
 
       // Live View runs get their own Xvfb display; size the browser window to fill it.
       on('before:browser:launch', (browser = {}, launchOptions) => {
-        const geometry = /^(\d+)x(\d+)$/.exec(process.env.CC_SCREEN_GEOMETRY || '')
+        const geometry = /^(\d+)x(\d+)$/.exec(process.env.E2E_HUB_SCREEN_GEOMETRY || '')
         if (!geometry) return launchOptions
         const width = Number(geometry[1])
         const height = Number(geometry[2])

@@ -1,5 +1,5 @@
 services:
-  control-center:
+  e2e-hub:
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -12,7 +12,7 @@ services:
       TRUST_PROXY: ${TRUST_PROXY:-0}
       MAX_CONCURRENT_RUNS_PER_USER: ${MAX_CONCURRENT_RUNS_PER_USER:-10}
     ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:${CONTROL_CENTER_PORT:-9877}:9877"
+      - "${BIND_ADDRESS:-127.0.0.1}:${E2E_HUB_PORT:-9877}:9877"
       - "${BIND_ADDRESS:-127.0.0.1}:${VNC_PORT:-6080}:6080"
     shm_size: 2gb
     volumes:
@@ -20,7 +20,7 @@ services:
       # Specs and the step catalog are mounted so new tests show up without a rebuild.
       - ./cypress:/app/cypress
       - ./test-reports:/app/test-reports
-      - control-center-data:/app/data
+      - e2e-hub-data:/app/data
 
 volumes:
-  control-center-data:
+  e2e-hub-data:

@@ -15,7 +15,7 @@ Cypress.ElementSelector.defaults({
   ],
 })
 
-// Slow mode: `--env delay=<ms>` (Control Center → Speed) pauses after every user-like
+// Slow mode: `--env delay=<ms>` (E2E Hub → Speed) pauses after every user-like
 // interaction so headed runs can be followed or presented.
 const DELAY = Number(Cypress.expose('delay')) || 0
 

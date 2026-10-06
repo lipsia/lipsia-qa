@@ -1,8 +1,8 @@
-// Turns the raw output of a Cypress run into what the Control Center shows: a filtered
+// Turns the raw output of a Cypress run into what the E2E Hub shows: a filtered
 // terminal stream, a result label and a detailed failure log.
 
 // Emitted by cypress.config.js (after:spec) — keep in sync.
-const SPEC_REPORT_MARKER = '[cc:spec-report]';
+const SPEC_REPORT_MARKER = '[e2e-hub:spec-report]';
 const FAILURE_LOG_MAX_CHARS = 20000;
 
 /** Collects spec report marker lines from raw stdout (chunk boundaries may split lines). */

@@ -11,7 +11,7 @@ cypress/screenshots/
 cypress/videos/
 cypress/downloads/
 
-# Control Center data (SQLite database)
+# E2E Hub data (SQLite database)
 /data/
 
 # Editors and OS

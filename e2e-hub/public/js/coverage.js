@@ -1,6 +1,6 @@
 (async function () {
-  const { api, escapeHtml, toast, openModal, confirmDialog, formatDateTime, ICONS, reveal, replay } = CC;
-  const me = await CC.initShell('coverage');
+  const { api, escapeHtml, toast, openModal, confirmDialog, formatDateTime, ICONS, reveal, replay } = Hub;
+  const me = await Hub.initShell('coverage');
 
   const STATUS_LABELS = {
     done: 'Done',
@@ -100,7 +100,7 @@
       groups = data.groups;
       statuses = data.statuses;
       render();
-      reveal($('groups'), ':scope > .card');
+      if (firstRender) reveal($('groups'), ':scope > .card');
       firstRender = false;
     } catch (err) {
       toast(err.message, 'error');

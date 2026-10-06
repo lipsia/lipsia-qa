@@ -42,6 +42,11 @@
   --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* One entrance for everything that appears: page load, JS-rendered lists, scroll reveal. */
+  --enter-duration: 0.5s;
+  --enter-ease: var(--ease-expo);
+  --enter-shift: 10px;
+  --enter-step: 50ms;
 
   --font: 'Rubik', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -128,7 +133,6 @@ code, kbd, pre { font-family: var(--font-mono); }
   color: #fff;
   box-shadow: 0 0 0 rgba(17, 12, 46, 0);
   transition: box-shadow 0.3s ease;
-  view-transition-name: app-header;
 }
 .app-header.is-scrolled { box-shadow: 0 6px 24px rgba(17, 12, 46, 0.28); }
 .app-header-inner {
@@ -140,18 +144,8 @@ code, kbd, pre { font-family: var(--font-mono); }
   align-items: center;
   gap: 28px;
 }
-.brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; flex-shrink: 0; }
+.brand { display: flex; align-items: center; flex-shrink: 0; }
 .brand img { height: 26px; display: block; }
-.brand-product {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  white-space: nowrap;
-}
 .app-nav { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .app-nav a {
   color: rgba(255, 255, 255, 0.78);
@@ -417,7 +411,7 @@ textarea.input { height: auto; min-height: 80px; padding: 10px 12px; resize: ver
 .segmented button:hover { color: var(--text); }
 .segmented button:active { transform: scale(0.95); }
 .segmented button.active { color: #fff; }
-/* Sliding marker behind the active option (positioned by CC.segmented). */
+/* Sliding marker behind the active option (positioned by Hub.segmented). */
 .segmented-thumb {
   position: absolute;
   z-index: 0;
@@ -568,7 +562,7 @@ table.table { width: 100%; border-collapse: collapse; }
 
 @media (max-width: 860px) {
   .app-header-inner { padding: 0 16px; gap: 14px; }
-  .brand-product, .user-chip .user-name { display: none; }
+  .user-chip .user-name { display: none; }
   .user-chip { padding: 4px; }
   .page { padding: 20px 16px 48px; }
   .page-head h1 { font-size: 22px; }
@@ -576,19 +570,21 @@ table.table { width: 100%; border-collapse: collapse; }
 
 /* ── Motion ─────────────────────────────────────────────────────────────── */
 
-/* Elements fade up as they enter the viewport (CC.reveal). */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s var(--ease-out); transition-delay: var(--reveal-delay, 0s); }
+@keyframes enter { from { opacity: 0; transform: translateY(var(--enter-shift)); } }
+
+/* Page entrance: pure CSS, so it runs from the first painted frame (no visible-then-hidden flash).
+   The header is not animated and stays put while switching tabs. */
+.page > * { animation: enter var(--enter-duration) var(--enter-ease) both; animation-delay: calc(var(--i, 0) * var(--enter-step)); }
+.page > :nth-child(2) { --i: 1; }
+.page > :nth-child(3) { --i: 2; }
+.page > :nth-child(n+4) { --i: 3; }
+
+/* JS-rendered rows and cards (Hub.stagger), same motion. */
+.anim-in { animation: enter var(--enter-duration) var(--enter-ease) both; animation-delay: calc(min(var(--i, 0), 12) * var(--enter-step)); }
+
+/* Content below the fold, revealed on scroll (Hub.reveal), same motion. */
+.reveal { opacity: 0; transform: translateY(var(--enter-shift)); transition: opacity var(--enter-duration) var(--enter-ease), transform var(--enter-duration) var(--enter-ease); transition-delay: calc(var(--i, 0) * var(--enter-step)); }
 .reveal.is-in { opacity: 1; transform: none; }
-
-/* Page title rises out of a mask; the subtitle follows. */
-.page-head h1 { overflow: hidden; padding-bottom: 2px; }
-.page-head h1 > .rise { display: inline-block; animation: rise 0.9s var(--ease-out) both; }
-.page-head h1 + p { animation: fade-up 0.8s var(--ease-out) 0.12s both; }
-@keyframes rise { from { transform: translateY(105%); } }
-
-/* Staggered entry for rows and list items rendered by JS (CC.stagger). */
-.anim-in { animation: fade-up 0.55s var(--ease-out) both; animation-delay: calc(min(var(--i, 0), 14) * 40ms); }
-@keyframes fade-up { from { opacity: 0; transform: translateY(12px); } }
 
 .grow-x { transform-origin: left center; animation: grow-x 0.9s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
 @keyframes grow-x { from { transform: scaleX(0); } }
@@ -596,22 +592,10 @@ table.table { width: 100%; border-collapse: collapse; }
 .pop { animation: pop 0.5s var(--ease-spring); }
 @keyframes pop { from { transform: scale(0.6); opacity: 0; } }
 
-/* Theme switch: circular reveal from the toggle (View Transitions), else a short colour fade. */
-::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-.theme-switching *:not(.theme-toggle svg), .theme-switching *::before, .theme-switching *::after { transition: none !important; animation-play-state: paused !important; }
-.theme-toggle { view-transition-name: theme-toggle; }
-::view-transition-old(theme-toggle) { display: none; }
-::view-transition-new(theme-toggle) { animation: none; }
-.theme-fade, .theme-fade *, .theme-fade *::before, .theme-fade *::after {
-  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease !important;
-}
-
-/* Cross-fade between pages; the header stays in place. */
-@view-transition { navigation: auto; }
-::view-transition-old(app-header), ::view-transition-new(app-header) { animation: none; }
+/* Theme switch: short cross-fade of the whole page (View Transitions). */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.22s; animation-timing-function: ease; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
-  @view-transition { navigation: none; }
 }

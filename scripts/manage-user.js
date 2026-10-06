@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// Control Center user management from the command line.
+// E2E Hub user management from the command line.
 //
 //   node scripts/manage-user.js add <username> <password> [admin|user]
 //   node scripts/manage-user.js list
 //   node scripts/manage-user.js passwd <username> <newPassword>
 //   node scripts/manage-user.js delete <username>
 //
-// Inside the container: docker compose exec control-center node scripts/manage-user.js …
+// Inside the container: docker compose exec e2e-hub node scripts/manage-user.js …
 
-const auth = require('../control-center/lib/auth');
+const auth = require('../e2e-hub/lib/auth');
 
 const USAGE = [
   'Usage:',

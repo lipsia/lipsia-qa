@@ -1,20 +1,20 @@
 PORT ?= 9877
 COMPOSE ?= docker compose
-SERVICE := control-center
+SERVICE := e2e-hub
 
 .DEFAULT_GOAL := help
-.PHONY: help setup control-center cypress-open up down logs build \
+.PHONY: help setup e2e-hub cypress-open up down logs build \
 	user-add user-list user-passwd user-delete \
 	user-add-docker user-list-docker user-passwd-docker user-delete-docker
 
 help:
 	@echo "\033[1;35mLocal\033[0m"
 	@echo "  make setup                     Install dependencies, create cypress.env.json and .env from the examples"
-	@echo "  make control-center            Start the Control Center on http://localhost:$(PORT)"
+	@echo "  make e2e-hub                   Start the E2E Hub on http://localhost:$(PORT)"
 	@echo "  make cypress-open              Open the Cypress app"
 	@echo ""
 	@echo "\033[1;35mDocker\033[0m"
-	@echo "  make up | down | logs | build  Manage the Control Center container"
+	@echo "  make up | down | logs | build  Manage the E2E Hub container"
 	@echo ""
 	@echo "\033[1;35mUsers\033[0m (append -docker to run inside the container)"
 	@echo "  make user-add NAME=<u> PASS=<p> [ROLE=admin]"
@@ -27,8 +27,8 @@ setup:
 	@test -f cypress.env.json || (cp cypress.env.example.json cypress.env.json && echo "Created cypress.env.json — adjust the stage URLs")
 	@test -f .env || (cp .env.example .env && sed -i.bak "s/^SESSION_SECRET=.*/SESSION_SECRET=$$(openssl rand -hex 32)/" .env && rm -f .env.bak && echo "Created .env with a random SESSION_SECRET")
 
-control-center:
-	set -a; [ -f .env ] && . ./.env; set +a; PORT=$(PORT) npm run control-center
+e2e-hub:
+	set -a; [ -f .env ] && . ./.env; set +a; PORT=$(PORT) npm run e2e-hub
 
 cypress-open:
 	npm run cy:open
